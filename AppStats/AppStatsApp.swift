@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct AppStatsApp: App {
+    //@State private var subscriptionModelData = SubscriptionModelData(data: ActiveSubscribersTestData.getActiveSubscribers())
+    @StateObject var appStatsModel = AppStatsModel()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appStatsModel)
         }
     }
 }
