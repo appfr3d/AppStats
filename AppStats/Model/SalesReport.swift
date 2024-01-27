@@ -75,6 +75,45 @@ enum SalesReportSubscriptionFields: String, CodingKey {
     case subscribers = "Subscribers"
 }
 
+func StringDecoder(reportRow: Named.Row, field: SalesReportSubscriptionFields) throws -> String {
+    let fieldName = field.rawValue
+    guard let stringValue = reportRow[fieldName] else {
+        print("Cound not get \(fieldName)")
+        throw SalesServiceError.tsvFieldNotFound(fieldName: fieldName)
+    }
+    return stringValue
+}
+
+func IntDecoder(reportRow: Named.Row, field: SalesReportSubscriptionFields) throws -> Int {
+    let fieldName = field.rawValue
+    guard let stringValue = reportRow[fieldName] else {
+        print("Cound not get \(fieldName)")
+        throw SalesServiceError.tsvFieldNotFound(fieldName: fieldName)
+    }
+    
+    if let intValue = Int(stringValue) {
+        return intValue
+    } else {
+        print("Could not convert \(fieldName) of value \(stringValue) to Int")
+        throw SalesServiceError.tsvFieldNotFound(fieldName: fieldName)
+    }
+}
+
+func DoubleDecoder(reportRow: Named.Row, field: SalesReportSubscriptionFields) throws -> Double {
+    let fieldName = field.rawValue
+    guard let stringValue = reportRow[fieldName] else {
+        print("Cound not get \(fieldName)")
+        throw SalesServiceError.tsvFieldNotFound(fieldName: fieldName)
+    }
+    
+    if let doubleValue = Double(stringValue) {
+        return doubleValue
+    } else {
+        print("Could not convert \(fieldName) of value \(stringValue) to Double")
+        throw SalesServiceError.tsvFieldNotFound(fieldName: fieldName)
+    }
+}
+
 struct SalesReportSubscription: Decodable {
     let appName: String
     let appAppleId: Int
@@ -144,42 +183,43 @@ struct SalesReportSubscription: Decodable {
         self.subscribers = subscribers
     }
     
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: SalesReportSubscriptionFields.self)
-
-        // Initialize properties using the enum cases
-        self.appName = try container.decodeIfPresent(String.self, forKey: .appName) ?? ""
-        self.appAppleId = try container.decodeIfPresent(Int.self, forKey: .appAppleId) ?? 0
-        self.subscriptionName = try container.decodeIfPresent(String.self, forKey: .subscriptionName) ?? ""
-        self.subscriptionAppleId = try container.decodeIfPresent(Int.self, forKey: .subscriptionAppleId) ?? 0
-        self.subscriptionGroupId = try container.decodeIfPresent(Int.self, forKey: .subscriptionGroupId) ?? 0
-        self.standardSubscriptionDuration = try container.decodeIfPresent(String.self, forKey: .standardSubscriptionDuration) ?? ""
-        self.subscriptionOfferName = try container.decodeIfPresent(String.self, forKey: .subscriptionOfferName) ?? ""
-        self.promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId) ?? ""
-        self.customerPrice = try container.decodeIfPresent(Double.self, forKey: .customerPrice) ?? 0.0
-        self.customerCurrency = try container.decodeIfPresent(String.self, forKey: .customerCurrency) ?? ""
-        self.developerProceeds = try container.decodeIfPresent(Double.self, forKey: .developerProceeds) ?? 0.0
-        self.proceedsCurrency = try container.decodeIfPresent(String.self, forKey: .proceedsCurrency) ?? ""
-        self.preservedPricing = try container.decodeIfPresent(String.self, forKey: .preservedPricing) ?? ""
-        self.proceedsReason = try container.decodeIfPresent(String.self, forKey: .proceedsReason) ?? ""
-        self.client = try container.decodeIfPresent(String.self, forKey: .client) ?? ""
-        self.device = try container.decodeIfPresent(String.self, forKey: .device) ?? ""
-        self.state = try container.decodeIfPresent(String.self, forKey: .state) ?? ""
-        self.country = try container.decodeIfPresent(String.self, forKey: .country) ?? ""
-        self.activeStandardPriceSubscriptions = try container.decodeIfPresent(Int.self, forKey: .activeStandardPriceSubscriptions) ?? 0
-        self.activeFreeTrialIntroductoryOfferSubscriptions = try container.decodeIfPresent(Int.self, forKey: .activeFreeTrialIntroductoryOfferSubscriptions) ?? 0
-        self.activePayUpFrontIntroductoryOfferSubscriptions = try container.decodeIfPresent(Int.self, forKey: .activePayUpFrontIntroductoryOfferSubscriptions) ?? 0
-        self.activePayAsYouGoIntroductoryOfferSubscriptions = try container.decodeIfPresent(Int.self, forKey: .activePayAsYouGoIntroductoryOfferSubscriptions) ?? 0
-        self.freeTrialPromotionalOfferSubscriptions = try container.decodeIfPresent(Int.self, forKey: .freeTrialPromotionalOfferSubscriptions) ?? 0
-        self.payUpFrontPromotionalOfferSubscriptions = try container.decodeIfPresent(Int.self, forKey: .payUpFrontPromotionalOfferSubscriptions) ?? 0
-        self.payAsYouGoPromotionalOfferSubscriptions = try container.decodeIfPresent(Int.self, forKey: .payAsYouGoPromotionalOfferSubscriptions) ?? 0
-        self.freeTrialOfferCodeSubscriptions = try container.decodeIfPresent(Int.self, forKey: .freeTrialOfferCodeSubscriptions) ?? 0
-        self.payUpFrontOfferCodeSubscriptions = try container.decodeIfPresent(Int.self, forKey: .payUpFrontOfferCodeSubscriptions) ?? 0
-        self.payAsYouGoOfferCodeSubscriptions = try container.decodeIfPresent(Int.self, forKey: .payAsYouGoOfferCodeSubscriptions) ?? 0
-        self.marketingOptIns = try container.decodeIfPresent(Int.self, forKey: .marketingOptIns) ?? 0
-        self.billingRetry = try container.decodeIfPresent(Int.self, forKey: .billingRetry) ?? 0
-        self.gracePeriod = try container.decodeIfPresent(Int.self, forKey: .gracePeriod) ?? 0
-        self.subscribers = try container.decodeIfPresent(Double.self, forKey: .subscribers) ?? 0.0
+    init(reportRow: Named.Row) throws {
+        self.appName = try StringDecoder(reportRow: reportRow, field: .appName)
+        self.appAppleId = try IntDecoder(reportRow: reportRow, field: .appAppleId)
+        self.subscriptionName = try StringDecoder(reportRow: reportRow, field: .subscriptionName)
+        self.subscriptionAppleId = try IntDecoder(reportRow: reportRow, field: .subscriptionAppleId)
+        self.subscriptionGroupId = try IntDecoder(reportRow: reportRow, field: .subscriptionGroupId)
+        self.standardSubscriptionDuration = try StringDecoder(reportRow: reportRow, field: .standardSubscriptionDuration)
+        self.subscriptionOfferName = try StringDecoder(reportRow: reportRow, field: .subscriptionOfferName)
+        self.promotionalOfferId = try StringDecoder(reportRow: reportRow, field: .promotionalOfferId)
+        self.customerPrice = try DoubleDecoder(reportRow: reportRow, field: .customerPrice)
+        self.customerCurrency = try StringDecoder(reportRow: reportRow, field: .customerCurrency)
+        self.developerProceeds = try DoubleDecoder(reportRow: reportRow, field: .developerProceeds)
+        self.proceedsCurrency = try StringDecoder(reportRow: reportRow, field: .proceedsCurrency)
+        self.preservedPricing = try StringDecoder(reportRow: reportRow, field: .preservedPricing)
+        self.proceedsReason = try StringDecoder(reportRow: reportRow, field: .proceedsReason)
+        self.client = try StringDecoder(reportRow: reportRow, field: .client)
+        self.device = try StringDecoder(reportRow: reportRow, field: .device)
+        self.state = try StringDecoder(reportRow: reportRow, field: .state)
+        self.country = try StringDecoder(reportRow: reportRow, field: .country)
+        self.activeStandardPriceSubscriptions = try IntDecoder(reportRow: reportRow, field: .activeStandardPriceSubscriptions)
+        self.activeFreeTrialIntroductoryOfferSubscriptions = try IntDecoder(reportRow: reportRow, field: .activeFreeTrialIntroductoryOfferSubscriptions)
+        self.activePayUpFrontIntroductoryOfferSubscriptions = try IntDecoder(reportRow: reportRow, field: .activePayUpFrontIntroductoryOfferSubscriptions)
+        self.activePayAsYouGoIntroductoryOfferSubscriptions = try IntDecoder(reportRow: reportRow, field: .activePayAsYouGoIntroductoryOfferSubscriptions)
+        self.freeTrialPromotionalOfferSubscriptions = try IntDecoder(reportRow: reportRow, field: .freeTrialPromotionalOfferSubscriptions)
+        self.payUpFrontPromotionalOfferSubscriptions = try IntDecoder(reportRow: reportRow, field: .payUpFrontPromotionalOfferSubscriptions)
+        self.payAsYouGoPromotionalOfferSubscriptions = try IntDecoder(reportRow: reportRow, field: .payAsYouGoPromotionalOfferSubscriptions)
+        self.freeTrialOfferCodeSubscriptions = try IntDecoder(reportRow: reportRow, field: .freeTrialOfferCodeSubscriptions)
+        self.payUpFrontOfferCodeSubscriptions = try IntDecoder(reportRow: reportRow, field: .payUpFrontOfferCodeSubscriptions)
+        self.payAsYouGoOfferCodeSubscriptions = try IntDecoder(reportRow: reportRow, field: .payAsYouGoOfferCodeSubscriptions)
+        self.marketingOptIns = try IntDecoder(reportRow: reportRow, field: .marketingOptIns)
+        self.billingRetry = try IntDecoder(reportRow: reportRow, field: .billingRetry)
+        self.gracePeriod = try IntDecoder(reportRow: reportRow, field: .gracePeriod)
+        if let subs = try? DoubleDecoder(reportRow: reportRow, field: .subscribers) {
+            self.subscribers = subs
+        } else {
+            self.subscribers = 0
+        }
     }
 }
 
@@ -193,12 +233,7 @@ struct SubscriptionReport: Identifiable {
     var id: String
     
     init(reportRow: Named.Row, date: Date) throws {
-        let salesReport = try JSONDecoder().decode(SalesReportSubscription.self, from: JSONSerialization.data(withJSONObject: reportRow))
-
-        // let decoder = JSONDecoder()
-        // decoder.keyDecodingStrategy = .convertFromSnakeCase  // Use the appropriate strategy based on your data
-        // let yourStructInstance = try decoder.decode(SalesReportSubscription.self, from: JSONSerialization.data(withJSONObject: reportRow))
-        
+        let salesReport = try SalesReportSubscription(reportRow: reportRow)
         self.report = salesReport
         self.date = date
         self.id = date.ISO8601Format() + salesReport.device + salesReport.country + salesReport.subscriptionName

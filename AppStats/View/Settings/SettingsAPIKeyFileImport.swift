@@ -85,6 +85,7 @@ struct SettingsAPIKeyFileImport<Content: View>: View {
                 content()
                 Spacer()
             }
+            .padding()
         }
     }
 }

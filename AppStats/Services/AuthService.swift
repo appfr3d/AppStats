@@ -29,22 +29,24 @@ class AuthService {
     
     func getSignedToken() throws -> String {
         let header = Header(kid: keyID)
-        let claims = AppstoreConnectClaims(iss: issuerID, iat: Date(), exp: Date(timeIntervalSinceNow: 60*60*24), aud: "appstoreconnect-v1")
+        let initiatedAt = Date(timeIntervalSince1970: TimeInterval(Int(Date().timeIntervalSince1970)))
+        let expiresAt = Date(timeIntervalSince1970: TimeInterval(Int(Date().timeIntervalSince1970)) + 60*10)
+        
+        let claims = AppstoreConnectClaims(iss: issuerID, iat: initiatedAt, exp: expiresAt, aud: "appstoreconnect-v1")
         var ACJWT = JWT(header: header, claims: claims)
         
-        // let privateKeyPath = URL(fileURLWithPath: #file).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("AuthKey.p8")
-        // print("privateKeyPath:", privateKeyPath)
-        // guard let privateKey: Data = try? Data(contentsOf: privateKeyPath, options: .alwaysMapped) else {
-        //     print("Could not get file...")
-        //     return nil
-        // }
+//        let privateKeyPath = URL(fileURLWithPath: #file).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("AuthKey.p8")
+//        guard let privateKey: Data = try? Data(contentsOf: privateKeyPath, options: .alwaysMapped) else {
+//            print("Could not get file...")
+//            throw AuthServiceError.apiKeyDataUnreadable
+//        }
         
-        guard let apyKeyData = apiKey.data(using: .utf8) else {
+        guard let apiKeyData = apiKey.data(using: .utf8) else {
             print("Could not make apit key to Data")
             throw AuthServiceError.apiKeyDataUnreadable
         }
         
-        let jwtSigner = JWTSigner.es256(privateKey: apyKeyData)
+        let jwtSigner = JWTSigner.es256(privateKey: apiKeyData)
         
         guard let signedJWT = try? ACJWT.sign(using: jwtSigner) else {
             print("Could not sign token...")
