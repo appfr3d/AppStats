@@ -6,13 +6,22 @@
 //
 
 import Foundation
+import AppIntents
 
 
-enum SubscriptionGroup: String {
+enum SubscriptionGroup: String, AppEnum {
     case none = "none"
     case appName = "appName"
     case country = "country"
     case subscriptionName = "subscriptionName"
+    
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Refresh Interval"
+    static var caseDisplayRepresentations: [SubscriptionGroup : DisplayRepresentation] = [
+        .none: "No grouping",
+        .appName: "App name",
+        .country: "Country",
+        .subscriptionName: "Subscription name"
+    ]
 }
 
 struct SubscriptionGroupByResult {
@@ -39,10 +48,6 @@ func groupSubscriptionBy<T>(list: [SubscriptionReport], keyClosure: (Subscriptio
     
     var result: [SubscriptionReport] = Array(groupedItems.values)
     result.sort(by: { $0.date < $1.date })
-    
-    for subscriber in result {
-        print(subscriber)
-    }
     
     return result
 }

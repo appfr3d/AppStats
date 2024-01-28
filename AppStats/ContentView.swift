@@ -41,7 +41,9 @@ struct ContentView: View {
                 NavigationLink(destination: SettingsView()) { Image(systemName: "gear") .foregroundColor(.black) }
             }
             .onAppear {
-                appStatsModel.checkKeychainStatus()
+                Task(priority: .medium) {
+                    try await appStatsModel.initiateAppStatsModel()
+                }
             }
         }
     }

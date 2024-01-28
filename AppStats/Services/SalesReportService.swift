@@ -56,11 +56,10 @@ class SalesReportService {
                     // print(tsv.rows.filter { $0["SKU"] == "blur_premium_monthly" || $0["SKU"] == "blur_premium_three_months" })
                     // print(tsv.columns?["Subscribers"] ?? "No column named that")
                     
-                    print(str)
+                    // print(str)
                     
                     // Store the TSV data as a string in UserDefaults, now that we know it can be decoded as a tsv
                     let userDefaultsKey = getUserDefaultsSubscriptionKey(forDate: date, andFrequency: .DAILY)
-                    print("userDefaultsKey", userDefaultsKey)
                     userDefaultsService.set(str, forKey: userDefaultsKey)
                     
                     let activeSubscribersRows = try tsv.rows.map { (element: Named.Row) -> SubscriptionReport in

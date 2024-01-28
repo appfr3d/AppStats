@@ -12,18 +12,19 @@ class SubscriptionModelData: ObservableObject {
     var totalData: [SubscriptionReport]
     var countryData: [SubscriptionReport]
     var subscriptionNameData: [SubscriptionReport]
+    var appNameData: [SubscriptionReport]
 
     var avarage: Double {
         let sum = data.map { $0.report.subscribers }.reduce(0.0, +)
         return sum / Double(data.count)
     }
     
-    var currentTotal : Double {
+    var currentTotal : Int {
         guard let last = self.totalData.last else {
             return 0
         }
         
-        return last.report.subscribers
+        return Int(last.report.subscribers)
     }
     
     init(data: [SubscriptionReport]) {
@@ -31,5 +32,6 @@ class SubscriptionModelData: ObservableObject {
         self.totalData = groupSubscriptionBy(list: data) { _ in "" }
         self.countryData = groupSubscriptionBy(list: data) { $0.report.country }
         self.subscriptionNameData = groupSubscriptionBy(list: data) { $0.report.subscriptionName }
+        self.appNameData = groupSubscriptionBy(list: data) { $0.report.appName }
     }
 }

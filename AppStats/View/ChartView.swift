@@ -10,6 +10,7 @@ import Charts
 
 struct ChartView: View {
     @Binding var grouping: SubscriptionGroup
+    @EnvironmentObject var subscriptionModelData: SubscriptionModelData
     
     @ViewBuilder
     var body: some View {
@@ -19,12 +20,49 @@ struct ChartView: View {
         case .appName:
             ChartViewSubscriptrionsTotal()
         case .country:
-            ChartViewSubscriptrionsByCountry()
+            SubscriptionsLineChartView(reportData: subscriptionModelData.countryData, dataSource: \.country)
         case .subscriptionName:
-            ChartViewSubscriptrionsBySubscriptionName()
+            SubscriptionsLineChartView(reportData: subscriptionModelData.subscriptionNameData, dataSource: \.subscriptionName)
         }
     }
 }
+
+struct SubscriptionsLineChartView: View {
+    var reportData: [SubscriptionReport]
+    var dataSource: KeyPath<SalesReportSubscription, String>
+    
+    init(reportData: [SubscriptionReport], dataSource: KeyPath<SalesReportSubscription, String>) {
+        self.reportData = reportData
+        self.dataSource = dataSource
+    }
+    
+    var body: some View {
+        VStack {
+            Chart(reportData) { sub in
+                LineMark(
+                    x: .value("Date", sub.date),
+                    y: .value("Subscribers", sub.report.subscribers)
+                )
+                .interpolationMethod(.catmullRom)
+                .symbol {
+                    Circle().frame(width: 8)
+                }
+                .foregroundStyle(by: .value("Subscription name", sub.report[keyPath: dataSource]))
+                
+                PointMark(
+                    x: .value("Date", sub.date),
+                    y: .value("Subscribers", sub.report.subscribers)
+                )
+                .annotation {
+                    Text("\(Int(sub.report.subscribers))").font(.footnote)
+                }
+                .foregroundStyle(by: .value("Subscription name", sub.report[keyPath: dataSource]))
+                
+            }
+        }
+    }
+}
+
 
 struct ChartViewSubscriptrionsTotal: View {
     @EnvironmentObject var subscriptionModelData: SubscriptionModelData
@@ -46,7 +84,36 @@ struct ChartViewSubscriptrionsTotal: View {
                     y: .value("Subscribers", sub.report.subscribers)
                 )
                 .annotation {
-                    Text("\(sub.report.subscribers)")
+                    Text("\(Int(sub.report.subscribers))")
+                }
+                
+            }
+        }
+    }
+}
+
+struct ChartViewSubscriptrionsByAppName: View {
+    @EnvironmentObject var subscriptionModelData: SubscriptionModelData
+    
+    var body: some View {
+        VStack {
+            Chart(subscriptionModelData.appNameData) { sub in
+                LineMark(
+                    x: .value("Date", sub.date),
+                    y: .value("Subscribers", sub.report.subscribers)
+                )
+                .interpolationMethod(.catmullRom)
+                .foregroundStyle(by: .value("Subscription name", sub.report.country))
+                .symbol {
+                    Circle().frame(width: 10)
+                }
+                
+                PointMark(
+                    x: .value("Date", sub.date),
+                    y: .value("Subscribers", sub.report.subscribers)
+                )
+                .annotation {
+                    Text("\(Int(sub.report.subscribers))")
                 }
                 
             }
@@ -65,18 +132,19 @@ struct ChartViewSubscriptrionsByCountry: View {
                     y: .value("Subscribers", sub.report.subscribers)
                 )
                 .interpolationMethod(.catmullRom)
-                .foregroundStyle(by: .value("Subscription name", sub.report.country))
                 .symbol {
                     Circle().frame(width: 10)
                 }
+                .foregroundStyle(by: .value("Subscription name", sub.report.country))
                 
                 PointMark(
                     x: .value("Date", sub.date),
                     y: .value("Subscribers", sub.report.subscribers)
                 )
                 .annotation {
-                    Text("\(sub.report.subscribers)")
+                    Text("\(Int(sub.report.subscribers))")
                 }
+                .foregroundStyle(by: .value("Subscription name", sub.report.country))
                 
             }
         }
@@ -104,7 +172,7 @@ struct ChartViewSubscriptrionsBySubscriptionName: View {
                     y: .value("Subscribers", sub.report.subscribers)
                 )
                 .annotation {
-                    Text("\(sub.report.subscribers)")
+                    Text("\(Int(sub.report.subscribers))")
                 }
                 
             }
@@ -126,10 +194,9 @@ struct ChartViewSubscriptrionsBySubscriptionName: View {
         .environmentObject(SubscriptionModelData(data: data))
 }
 
-#Preview("Subsription Name") {
+#Preview("Subscription Name") {
     @State var grouping = SubscriptionGroup.subscriptionName
     let data = ActiveSubscribersTestData.getActiveSubscribers()
     return ChartView(grouping: $grouping)
         .environmentObject(SubscriptionModelData(data: data))
 }
-

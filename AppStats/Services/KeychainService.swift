@@ -11,11 +11,13 @@ class KeychainService {
 
     // MARK: - Properties
 
+    private let accessGroup: String = "group.no.appfred.AppStats.shared"
     private let service: String
 
     // MARK: - Initialization
 
     init(service: String) {
+        print("Setting keychain service key as \(service)")
         self.service = service
     }
 
@@ -32,6 +34,7 @@ class KeychainService {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
             kSecValueData as String: data
         ]
 
@@ -72,6 +75,7 @@ class KeychainService {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
             kSecMatchLimit as String: kSecMatchLimitOne,
             kSecReturnData as String: kCFBooleanTrue!
         ]
@@ -91,7 +95,8 @@ class KeychainService {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: key
+            kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
         ]
 
         // Delete the item from the keychain

@@ -17,7 +17,7 @@ struct SettingsView: View {
     @State private var keyId = keychainService.loadSecretValue(forKey: kKeychainKeyId) ?? ""
     @State private var issuerId = keychainService.loadSecretValue(forKey: kKeychainIssuerId) ?? ""
     
-    func saveCredentialsToKeychain() {
+    func saveCredentialsToKeychain() async throws {
         switch apiKey {
         case .success(let value):
             let _ = keychainService.saveSecretValue(value, forKey: kKeychainAPIKey)
@@ -28,7 +28,7 @@ struct SettingsView: View {
         let _ = keychainService.saveSecretValue(vendorNumber, forKey: kKeychainVendorNumber)
         let _ = keychainService.saveSecretValue(keyId, forKey: kKeychainKeyId)
         let _ = keychainService.saveSecretValue(issuerId, forKey: kKeychainIssuerId)
-        appStatsModel.checkKeychainStatus()
+        try await appStatsModel.initiateAppStatsModel()
         dismiss()
     }
     
@@ -50,7 +50,9 @@ struct SettingsView: View {
                         IssuerIDInfoView()
                     }
                     Button("Save") {
-                        saveCredentialsToKeychain()
+                        Task(priority: .medium) {
+                            try await saveCredentialsToKeychain()
+                        }
                     }
                     .frame(maxWidth: .infinity)
                     .buttonStyle(.borderedProminent)
@@ -58,7 +60,7 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("AppStore Connect Credentials")
-            .padding()
+            .padding([.top, .horizontal])
             .background(Color(.systemGroupedBackground))
             
         }
