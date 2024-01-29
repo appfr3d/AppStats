@@ -59,6 +59,8 @@
 		798EF5A42B1681FA00435ED3 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798EF5A32B1681FA00435ED3 /* AuthService.swift */; };
 		798EF5A82B16826F00435ED3 /* JWTHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798EF5A72B16826F00435ED3 /* JWTHeader.swift */; };
 		798EF5AB2B1683A200435ED3 /* SwiftJWT in Frameworks */ = {isa = PBXBuildFile; productRef = 798EF5AA2B1683A200435ED3 /* SwiftJWT */; };
+		79D47FB62B6675AE00626800 /* View+Extention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D47FB52B6675AE00626800 /* View+Extention.swift */; };
+		79D47FB72B6675AE00626800 /* View+Extention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D47FB52B6675AE00626800 /* View+Extention.swift */; };
 		79DE33DD2B474A5A007B057B /* LoadingDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797C5D1A2B2DB73400829D21 /* LoadingDataView.swift */; };
 		79DE33DE2B474A73007B057B /* openapi-generator-config.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 798EF59F2B0E5AF400435ED3 /* openapi-generator-config.yaml */; };
 		79DE33E32B475296007B057B /* KeychainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DE33E22B475296007B057B /* KeychainModel.swift */; };
@@ -156,6 +158,7 @@
 		798EF59F2B0E5AF400435ED3 /* openapi-generator-config.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = "openapi-generator-config.yaml"; sourceTree = "<group>"; };
 		798EF5A32B1681FA00435ED3 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		798EF5A72B16826F00435ED3 /* JWTHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWTHeader.swift; sourceTree = "<group>"; };
+		79D47FB52B6675AE00626800 /* View+Extention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extention.swift"; sourceTree = "<group>"; };
 		79DE33E22B475296007B057B /* KeychainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainModel.swift; sourceTree = "<group>"; };
 		79DE33F72B499F9D007B057B /* SubscriptionWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionWidget.swift; sourceTree = "<group>"; };
 		79DE33F92B4ACAFB007B057B /* UserDefaultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsModel.swift; sourceTree = "<group>"; };
@@ -297,6 +300,7 @@
 		798EF5662B09011000435ED3 /* AppStats */ = {
 			isa = PBXGroup;
 			children = (
+				79D47FB42B66759D00626800 /* Extentions */,
 				790797262B1F9541007E6664 /* View */,
 				798EF5A62B16825F00435ED3 /* Model */,
 				798EF5A22B1681DD00435ED3 /* Services */,
@@ -360,6 +364,14 @@
 				79F0D2D52B349AF900294E55 /* AppStatsModel.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		79D47FB42B66759D00626800 /* Extentions */ = {
+			isa = PBXGroup;
+			children = (
+				79D47FB52B6675AE00626800 /* View+Extention.swift */,
+			);
+			path = Extentions;
 			sourceTree = "<group>";
 		};
 		79F0D2D12B33A9E200294E55 /* Settings */ = {
@@ -592,6 +604,7 @@
 				798E6BB02B44B28000F06B12 /* ChartGroups.swift in Sources */,
 				79DE33FB2B4ACAFB007B057B /* UserDefaultsModel.swift in Sources */,
 				798E6BB22B44B28800F06B12 /* SubscriptionModelData.swift in Sources */,
+				79D47FB72B6675AE00626800 /* View+Extention.swift in Sources */,
 				79DE33DD2B474A5A007B057B /* LoadingDataView.swift in Sources */,
 				798E6BAC2B44B24700F06B12 /* SalesReportService.swift in Sources */,
 				798E6BAE2B44B25B00F06B12 /* SalesReport.swift in Sources */,
@@ -623,6 +636,7 @@
 				790797282B1F9550007E6664 /* ChartView.swift in Sources */,
 				7907971E2B1D2776007E6664 /* SalesReportService.swift in Sources */,
 				797C5D152B2B00A200829D21 /* SettingsView.swift in Sources */,
+				79D47FB62B6675AE00626800 /* View+Extention.swift in Sources */,
 				79F2DAB32B37240C0077FC02 /* VendorNumberInfoView.swift in Sources */,
 				79F2DAA52B3502D50077FC02 /* InsertCredentialsView.swift in Sources */,
 				797C5D182B2B02D200829D21 /* HomeView.swift in Sources */,
