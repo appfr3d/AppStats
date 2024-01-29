@@ -4,12 +4,12 @@
 //
 //  Created by Alfred Lieth Årøe on 21/12/2023.
 //
-
 import Foundation
 import OpenAPIRuntime
 import OpenAPIURLSession
+import SwiftUI
 
-enum AppStatsState  {
+enum AppStatsState {
     case success(subscriberModelData: SubscriptionModelData)
     case authServiceError(error: AuthServiceError)
     case salesServiceError(error: SalesServiceError)
@@ -19,22 +19,24 @@ enum AppStatsState  {
 
 class AppStatsModel: ObservableObject {
     @Published var state: AppStatsState = .notInitialized
-    @Published var salesReportService: SalesReportService? = nil
-    @Published var authService: AuthService? = nil
+    @Published var salesReportService: SalesReportService?
+    @Published var authService: AuthService?
     
     func getSubscriptionData() async throws {
         print("Getting subscription data")
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
         
         guard let salesReportService = salesReportService else {
-            state = .salesServiceError(error: .notInitialized)
+            DispatchQueue.main.async {
+                self.state = .salesServiceError(error: .notInitialized)
+            }
             return
         }
         
-        let data: [SubscriptionReport]
         do {
-            data = try await salesReportService.getSubscriptionsFromLastSevenDays()
+            let data = try await salesReportService.getSubscriptionsFromLastSevenDays()
+            DispatchQueue.main.async {
+                self.state = .success(subscriberModelData: SubscriptionModelData(data: data))
+            }
         } catch let error {
             if let myError = error as? SalesServiceError {
                 print("unexpected")
@@ -47,11 +49,6 @@ class AppStatsModel: ObservableObject {
                     self.state = .salesServiceError(error: .unexpected(code: -1))
                 }
             }
-            return
-        }
-        
-        DispatchQueue.main.async {
-            self.state = .success(subscriberModelData: SubscriptionModelData(data: data))
         }
     }
     
@@ -79,17 +76,31 @@ class AppStatsModel: ObservableObject {
     func createSalesReportService() -> SalesReportService? {
         guard let authService = authService else {
             print("Auth service is nil")
-            state = .authServiceError(error: .notInitialized)
+            DispatchQueue.main.async {
+                self.state = .authServiceError(error: .notInitialized)
+            }
             return nil
         }
         
-        state = .loading
+        DispatchQueue.main.async {
+            self.state = .loading
+        }
         
-        let sessionConfiguration = URLSessionConfiguration.default
-        
-        let signedToken: String
         do {
-            signedToken = try authService.getSignedToken()
+            let signedToken = try authService.getSignedToken()
+            
+            let sessionConfiguration = URLSessionConfiguration.default
+            sessionConfiguration.httpAdditionalHeaders = [
+                "Authorization": "Bearer \(signedToken)"
+            ]
+            let session = URLSession(configuration: sessionConfiguration)
+            let transportConfiguration = URLSessionTransport.Configuration(session: session)
+            let client = Client(
+                serverURL: try! Servers.server1(),
+                transport: URLSessionTransport(configuration: transportConfiguration)
+            )
+            
+            return SalesReportService(client: client, vendorNumber: authService.vendorNumber)
         } catch let error {
             if let myError = error as? AuthServiceError {
                 DispatchQueue.main.async {
@@ -103,27 +114,17 @@ class AppStatsModel: ObservableObject {
             }
             return nil
         }
-
-        // print("Signed Token: \(signedToken)")
-        
-        sessionConfiguration.httpAdditionalHeaders = [
-            "Authorization": "Bearer \(signedToken)"
-        ]
-        
-        let session = URLSession(configuration: sessionConfiguration)
-        let transportConfiguration = URLSessionTransport.Configuration(session: session)
-        let client = Client(
-            serverURL: try! Servers.server1(),
-            transport: URLSessionTransport(configuration: transportConfiguration)
-        )
-        
-        return SalesReportService(client: client, vendorNumber: authService.vendorNumber)
     }
     
     func initiateAppStatsModel() async throws {
-        self.authService = self.createAuthService()
-        self.salesReportService = self.createSalesReportService()
-        try await self.getSubscriptionData()
+        DispatchQueue.main.async {
+            self.authService = self.createAuthService()
+            self.salesReportService = self.createSalesReportService()
+        }
+        do {
+            try await self.getSubscriptionData()
+        } catch {
+            print("Error getting subscription data: \(error)")
+        }
     }
-    
 }

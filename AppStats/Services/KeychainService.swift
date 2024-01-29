@@ -11,13 +11,13 @@ class KeychainService {
 
     // MARK: - Properties
 
-    private let accessGroup: String = "group.no.appfred.AppStats.shared"
+    private let accessGroup: String = "RXKX3DV52F.group.no.appfred.AppStats.shared"
     private let service: String
 
     // MARK: - Initialization
 
     init(service: String) {
-        print("Setting keychain service key as \(service)")
+        print("Setting keychain service key as \(service) with bundle identifier: \(Bundle.main.bundleIdentifier!)")
         self.service = service
     }
 
@@ -35,11 +35,13 @@ class KeychainService {
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
             kSecAttrAccessGroup as String: accessGroup,
-            kSecValueData as String: data
+            // kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+            // kSecValueData as String: data
         ]
 
         // Check if the item already exists
         if let _ = loadSecretValue(forKey: key) {
+            print("Item already exists, trying to update")
             // If it exists, update the existing item
             let attributes: [String: Any] = [
                 kSecValueData as String: data
@@ -49,21 +51,26 @@ class KeychainService {
             
             return status == errSecSuccess
         } else {
+            print("Item doesn't exist, creating a new one")
             // If it doesn't exist, create a new item
             query[kSecValueData as String] = data
 
             // Add access control to make the item accessible after first unlock
-            let accessControl = SecAccessControlCreateWithFlags(
-                nil,
-                kSecAttrAccessibleAfterFirstUnlock,
-                .privateKeyUsage,
-                nil
-            )
-
-            query[kSecAttrAccessControl as String] = accessControl
+//            let accessControl = SecAccessControlCreateWithFlags(
+//                nil,
+//                kSecAttrAccessibleAfterFirstUnlock,
+//                .privateKeyUsage,
+//                nil
+//            )
+//
+//            query[kSecAttrAccessControl as String] = accessControl
 
             // Add the item to the keychain
             let status = SecItemAdd(query as CFDictionary, nil)
+            
+            if status != errSecSuccess {
+                print("Error saving to Keychain: \(status))")
+            }
             
             return status == errSecSuccess
         }

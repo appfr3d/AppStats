@@ -20,7 +20,8 @@ struct SettingsView: View {
     func saveCredentialsToKeychain() async throws {
         switch apiKey {
         case .success(let value):
-            let _ = keychainService.saveSecretValue(value, forKey: kKeychainAPIKey)
+            let isSuccess = keychainService.saveSecretValue(value, forKey: kKeychainAPIKey)
+            print("Tried to save API Key, got: \(isSuccess)")
             break
         default:
             break
@@ -28,7 +29,11 @@ struct SettingsView: View {
         let _ = keychainService.saveSecretValue(vendorNumber, forKey: kKeychainVendorNumber)
         let _ = keychainService.saveSecretValue(keyId, forKey: kKeychainKeyId)
         let _ = keychainService.saveSecretValue(issuerId, forKey: kKeychainIssuerId)
-        try await appStatsModel.initiateAppStatsModel()
+        do {
+            try await appStatsModel.initiateAppStatsModel()
+        } catch let error {
+            print("Got error when trying to save credentials: \(error)")
+        }
         dismiss()
     }
     

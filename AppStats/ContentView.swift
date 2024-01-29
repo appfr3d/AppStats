@@ -11,6 +11,7 @@ import OpenAPIURLSession
 import Charts
 
 struct ContentView: View {
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var appStatsModel: AppStatsModel
     @State var isSettingsVisible: Bool = false
     
@@ -38,7 +39,9 @@ struct ContentView: View {
             .padding()
             .navigationTitle("AppStats 📈")
             .toolbar {
-                NavigationLink(destination: SettingsView()) { Image(systemName: "gear") .foregroundColor(.black) }
+                NavigationLink(destination: SettingsView()) {
+                    Image(systemName: "gear").foregroundColor(colorScheme == .dark ? .white : .black)
+                }
             }
             .onAppear {
                 Task(priority: .medium) {

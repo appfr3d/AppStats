@@ -18,7 +18,7 @@ struct ChartView: View {
         case .none:
             ChartViewSubscriptrionsTotal()
         case .appName:
-            ChartViewSubscriptrionsTotal()
+            SubscriptionsLineChartView(reportData: subscriptionModelData.appNameData, dataSource: \.appName)
         case .country:
             SubscriptionsLineChartView(reportData: subscriptionModelData.countryData, dataSource: \.country)
         case .subscriptionName:
@@ -76,7 +76,7 @@ struct ChartViewSubscriptrionsTotal: View {
                 )
                 .interpolationMethod(.catmullRom)
                 .symbol {
-                    Circle().frame(width: 10)
+                    Circle().frame(width: 8)
                 }
                 
                 PointMark(
@@ -84,7 +84,7 @@ struct ChartViewSubscriptrionsTotal: View {
                     y: .value("Subscribers", sub.report.subscribers)
                 )
                 .annotation {
-                    Text("\(Int(sub.report.subscribers))")
+                    Text("\(Int(sub.report.subscribers))").font(.footnote)
                 }
                 
             }

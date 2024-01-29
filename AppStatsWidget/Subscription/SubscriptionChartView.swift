@@ -12,7 +12,10 @@ struct SubscriptionChartView: View {
     @Binding var grouping: SubscriptionGroup
     
     var body: some View {
-        ChartView(grouping: $grouping)
+        VStack(alignment: .leading) {
+            Text("Total: \(subscriptionModelData.currentTotal)").font(.subheadline)
+            ChartView(grouping: $grouping)
+        }
     }
 }
 
