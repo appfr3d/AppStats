@@ -16,6 +16,7 @@
 		79282AFA2B65363F00D00EF1 /* openapi.json in Resources */ = {isa = PBXBuildFile; fileRef = 796F91E22B65076D00F5FDC6 /* openapi.json */; };
 		79282B0B2B655B8C00D00EF1 /* SubscriptionChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79282B0A2B655B8C00D00EF1 /* SubscriptionChartView.swift */; };
 		79282B0C2B655B9500D00EF1 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790797272B1F9550007E6664 /* ChartView.swift */; };
+		7962DE7A2B684BA200AD21F8 /* SalesServiceErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F2DAA82B3507FE0077FC02 /* SalesServiceErrorView.swift */; };
 		796F91DB2B5C9F9D00F5FDC6 /* ActiveSubscribersTestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7982A6C72B25EBA4009747BC /* ActiveSubscribersTestData.swift */; };
 		796F91E32B65076D00F5FDC6 /* openapi.json in Resources */ = {isa = PBXBuildFile; fileRef = 796F91E22B65076D00F5FDC6 /* openapi.json */; };
 		797462AC2B37A6BC009A6C2D /* NumberedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797462AB2B37A6BC009A6C2D /* NumberedText.swift */; };
@@ -591,6 +592,7 @@
 			files = (
 				798E6BAF2B44B25F00F06B12 /* JWTHeader.swift in Sources */,
 				798E6BB12B44B28300F06B12 /* AppStatsModel.swift in Sources */,
+				7962DE7A2B684BA200AD21F8 /* SalesServiceErrorView.swift in Sources */,
 				79DE33E52B4752BE007B057B /* KeychainModel.swift in Sources */,
 				798E6B9B2B44943700F06B12 /* AppStatsWidgetBundle.swift in Sources */,
 				798E6B9D2B44943700F06B12 /* AppStatsWidget.swift in Sources */,

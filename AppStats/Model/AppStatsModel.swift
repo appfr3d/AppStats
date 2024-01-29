@@ -100,6 +100,9 @@ class AppStatsModel: ObservableObject {
                 transport: URLSessionTransport(configuration: transportConfiguration)
             )
             
+            
+            print("createSalesReportService success")
+            
             return SalesReportService(client: client, vendorNumber: authService.vendorNumber)
         } catch let error {
             if let myError = error as? AuthServiceError {
@@ -117,10 +120,8 @@ class AppStatsModel: ObservableObject {
     }
     
     func initiateAppStatsModel() async throws {
-        DispatchQueue.main.async {
-            self.authService = self.createAuthService()
-            self.salesReportService = self.createSalesReportService()
-        }
+        self.authService = self.createAuthService()
+        self.salesReportService = self.createSalesReportService()
         do {
             try await self.getSubscriptionData()
         } catch {

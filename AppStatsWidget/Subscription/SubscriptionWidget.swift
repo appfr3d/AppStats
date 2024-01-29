@@ -52,7 +52,7 @@ struct SubscriptionWidgetEntryView : View {
                     Text("Auth error: \(error.localizedDescription)")
                 }
             case .salesServiceError(let error):
-                Text("Sales service error: \(error.localizedDescription)")
+                SalesServiceErrorView(error: error)
             case .notInitialized:
                 Text("Not initialized")
             case .loading:
