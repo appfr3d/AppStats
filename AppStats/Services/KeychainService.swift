@@ -35,8 +35,7 @@ class KeychainService {
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
             kSecAttrAccessGroup as String: accessGroup,
-            // kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
-            // kSecValueData as String: data
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
         ]
 
         // Check if the item already exists
@@ -54,16 +53,6 @@ class KeychainService {
             print("Item doesn't exist, creating a new one")
             // If it doesn't exist, create a new item
             query[kSecValueData as String] = data
-
-            // Add access control to make the item accessible after first unlock
-//            let accessControl = SecAccessControlCreateWithFlags(
-//                nil,
-//                kSecAttrAccessibleAfterFirstUnlock,
-//                .privateKeyUsage,
-//                nil
-//            )
-//
-//            query[kSecAttrAccessControl as String] = accessControl
 
             // Add the item to the keychain
             let status = SecItemAdd(query as CFDictionary, nil)
