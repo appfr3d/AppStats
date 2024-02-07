@@ -46,7 +46,9 @@ func groupSubscriptionBy<T>(list: [SubscriptionReport], keyClosure: (Subscriptio
         }
     }
     
-    var result: [SubscriptionReport] = Array(groupedItems.values)
+    var result: [SubscriptionReport] = Array(groupedItems.values).filter {
+        $0.report.subscribers > 0
+    }
     result.sort(by: { $0.date < $1.date })
     
     return result
