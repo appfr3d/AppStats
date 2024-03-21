@@ -120,8 +120,21 @@ class AppStatsModel: ObservableObject {
     }
     
     func initiateAppStatsModel() async throws {
+        DispatchQueue.main.async {
+            self.authService = self.createAuthService()
+            self.salesReportService = self.createSalesReportService()
+        }
+        do {
+            try await self.getSubscriptionData()
+        } catch {
+            print("Error getting subscription data: \(error)")
+        }
+    }
+    
+    func initiateWidgetAppStatsModel() async throws {
         self.authService = self.createAuthService()
         self.salesReportService = self.createSalesReportService()
+        
         do {
             try await self.getSubscriptionData()
         } catch {

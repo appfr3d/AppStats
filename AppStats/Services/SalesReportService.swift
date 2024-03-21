@@ -50,76 +50,20 @@ class SalesReportService {
                 if data.isGzipped {
                     let unzipped = try! data.gunzipped()
                     let str = String(decoding: unzipped, as: Unicode.ASCII.self)
-                    // print(str)
                     let tsv: CSV = try CSV<Named>(string: str, delimiter: .tab)
-                    // print(tsv.header)
-                    // print(tsv.rows.filter { $0["SKU"] == "blur_premium_monthly" || $0["SKU"] == "blur_premium_three_months" })
-                    // print(tsv.columns?["Subscribers"] ?? "No column named that")
-                    
-                    // print(str)
                     
                     // Store the TSV data as a string in UserDefaults, now that we know it can be decoded as a tsv
                     let userDefaultsKey = getUserDefaultsSubscriptionKey(forDate: date, andFrequency: .DAILY)
                     userDefaultsService.set(str, forKey: userDefaultsKey)
                     
                     let activeSubscribersRows = try tsv.rows.map { (element: Named.Row) -> SubscriptionReport in
-                        
                         return try SubscriptionReport(reportRow: element, date: date)
-                        /*
-                        let subscribersFieldName = SalesReportSubscriptionFields.subscribers.rawValue
-                        guard let subscribers = element[subscribersFieldName] else {
-                            print("Cound not get \(subscribersFieldName)")
-                            throw SalesServiceError.tsvFieldNotFound(fieldName: subscribersFieldName)
-                        }
-                        
-                        let countryFieldName = SalesReportSubscriptionFields.country.rawValue
-                        guard let country = element[countryFieldName] else {
-                            print("Cound not get \(countryFieldName)")
-                            throw SalesServiceError.tsvFieldNotFound(fieldName: countryFieldName)
-                        }
-                        
-                        let subscriptionNameFieldName = SalesReportSubscriptionFields.subscriptionName.rawValue
-                        guard let subscriptionName = element[subscriptionNameFieldName] else {
-                            print("Cound not get \(subscriptionNameFieldName)")
-                            throw SalesServiceError.tsvFieldNotFound(fieldName: subscriptionNameFieldName)
-                        }
-                        
-                        var subs = 0.0
-                        if !subscribers.isEmpty {
-                            subs = try Double(value: subscribers)
-                        }
-                        
-                        return ActiveSubscribers(
-                            subscribers: Int(subs),
-                            date: date,
-                            country: country,
-                            subscriptionName: subscriptionName
-                        )*/
                     }
                     return activeSubscribersRows
-                    
-//                    if let subs = tsv.columns?["Subscribers"] {
-//                        let sum = subs
-//                            .filter { !$0.isEmpty }
-//                            .compactMap { Double($0) }
-//                            .reduce(0.0, +)
-//                        print("Count nr: \(count) has this many subs: \(sum)")
-//                        return DailySubscribers(
-//                            subscribers: Int(sum),
-//                            date: date,
-//                            country: "NOK",
-//                            subscriptionName: "premium"
-//                        )
-//                    } else {
-//                        throw SalesServiceError.tsvFieldNotFound(fieldName: "Subscribers")
-//                    }
-                    
                 } else {
                     print("data is not gzipped...")
-                    
                     throw SalesServiceError.dataNotGzipped
                 }
-                // print(buffer)
                 
             }
         case let .badRequest(res):
@@ -169,6 +113,28 @@ class SalesReportService {
         }
         
         let constantDates = dates
+        
+        do {
+            let subs = try await withThrowingTaskGroup(of: [SubscriptionReport].self) { group -> [SubscriptionReport] in
+                for i in 1...7 {
+                    guard let newDate = Calendar.current.date(byAdding: .day, value: -(9-i), to: theDate) else {
+                        print("Could not get date for i: \(i)")
+                        throw SalesServiceError.dateFormat
+                    }
+                    group.addTask {
+                        let subs = try await self.getSubscriptions(date: newDate)
+                        return subs
+                    }
+                }
+                let allSubs = try await group.reduce(into: [SubscriptionReport]()) { $0 += $1 }
+                return allSubs.sorted { $0.date > $1.date }
+            }
+            return subs
+        } catch let err {
+            print("rip... because: \(err)")
+            throw err
+        }
+        
         
         async let subs1 = getSubscriptions(date: constantDates[0])
         async let subs2 = getSubscriptions(date: constantDates[1])

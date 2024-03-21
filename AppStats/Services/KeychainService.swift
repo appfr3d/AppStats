@@ -11,7 +11,7 @@ class KeychainService {
 
     // MARK: - Properties
 
-    private let accessGroup: String = "RXKX3DV52F.group.no.appfred.AppStats.shared"
+    private let accessGroup: String = "group.no.appfred.AppStats.shared"
     private let service: String
 
     // MARK: - Initialization
@@ -35,7 +35,7 @@ class KeychainService {
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
             kSecAttrAccessGroup as String: accessGroup,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
         ]
 
         // Check if the item already exists
