@@ -17,6 +17,10 @@
 		79282B0B2B655B8C00D00EF1 /* SubscriptionChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79282B0A2B655B8C00D00EF1 /* SubscriptionChartView.swift */; };
 		79282B0C2B655B9500D00EF1 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790797272B1F9550007E6664 /* ChartView.swift */; };
 		7962DE7A2B684BA200AD21F8 /* SalesServiceErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F2DAA82B3507FE0077FC02 /* SalesServiceErrorView.swift */; };
+		7962DE862B75528300AD21F8 /* AuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7962DE852B75528300AD21F8 /* AuthState.swift */; };
+		7962DE872B75528300AD21F8 /* AuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7962DE852B75528300AD21F8 /* AuthState.swift */; };
+		7962DE892B75614500AD21F8 /* SalesReportState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7962DE882B75614500AD21F8 /* SalesReportState.swift */; };
+		7962DE8A2B75614500AD21F8 /* SalesReportState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7962DE882B75614500AD21F8 /* SalesReportState.swift */; };
 		796F91DB2B5C9F9D00F5FDC6 /* ActiveSubscribersTestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7982A6C72B25EBA4009747BC /* ActiveSubscribersTestData.swift */; };
 		796F91E32B65076D00F5FDC6 /* openapi.json in Resources */ = {isa = PBXBuildFile; fileRef = 796F91E22B65076D00F5FDC6 /* openapi.json */; };
 		797462AC2B37A6BC009A6C2D /* NumberedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797462AB2B37A6BC009A6C2D /* NumberedText.swift */; };
@@ -128,6 +132,8 @@
 		790797222B1F94AB007E6664 /* SubscriptionModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionModelData.swift; sourceTree = "<group>"; };
 		790797272B1F9550007E6664 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		79282B0A2B655B8C00D00EF1 /* SubscriptionChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionChartView.swift; sourceTree = "<group>"; };
+		7962DE852B75528300AD21F8 /* AuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthState.swift; sourceTree = "<group>"; };
+		7962DE882B75614500AD21F8 /* SalesReportState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SalesReportState.swift; sourceTree = "<group>"; };
 		796F91E22B65076D00F5FDC6 /* openapi.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = openapi.json; sourceTree = "<group>"; };
 		797462AB2B37A6BC009A6C2D /* NumberedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberedText.swift; sourceTree = "<group>"; };
 		797C5D142B2B00A200829D21 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -244,6 +250,15 @@
 			path = Subscription;
 			sourceTree = "<group>";
 		};
+		7962DE842B75525200AD21F8 /* State */ = {
+			isa = PBXGroup;
+			children = (
+				7962DE852B75528300AD21F8 /* AuthState.swift */,
+				7962DE882B75614500AD21F8 /* SalesReportState.swift */,
+			);
+			path = State;
+			sourceTree = "<group>";
+		};
 		7982A6C52B25EB77009747BC /* TestData */ = {
 			isa = PBXGroup;
 			children = (
@@ -301,6 +316,7 @@
 		798EF5662B09011000435ED3 /* AppStats */ = {
 			isa = PBXGroup;
 			children = (
+				7962DE842B75525200AD21F8 /* State */,
 				79D47FB42B66759D00626800 /* Extentions */,
 				790797262B1F9541007E6664 /* View */,
 				798EF5A62B16825F00435ED3 /* Model */,
@@ -605,12 +621,14 @@
 				79282B0B2B655B8C00D00EF1 /* SubscriptionChartView.swift in Sources */,
 				798E6BB02B44B28000F06B12 /* ChartGroups.swift in Sources */,
 				79DE33FB2B4ACAFB007B057B /* UserDefaultsModel.swift in Sources */,
+				7962DE872B75528300AD21F8 /* AuthState.swift in Sources */,
 				798E6BB22B44B28800F06B12 /* SubscriptionModelData.swift in Sources */,
 				79D47FB72B6675AE00626800 /* View+Extention.swift in Sources */,
 				79DE33DD2B474A5A007B057B /* LoadingDataView.swift in Sources */,
 				798E6BAC2B44B24700F06B12 /* SalesReportService.swift in Sources */,
 				798E6BAE2B44B25B00F06B12 /* SalesReport.swift in Sources */,
 				798E6B9F2B44943700F06B12 /* AppIntent.swift in Sources */,
+				7962DE8A2B75614500AD21F8 /* SalesReportState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -620,11 +638,13 @@
 			files = (
 				79F0D2D62B349AF900294E55 /* AppStatsModel.swift in Sources */,
 				79F0D2CB2B33396F00294E55 /* SettingsTextField.swift in Sources */,
+				7962DE892B75614500AD21F8 /* SalesReportState.swift in Sources */,
 				7982A6BF2B252E53009747BC /* ChartGroups.swift in Sources */,
 				79F2DAB52B37245D0077FC02 /* KeyIDInfoView.swift in Sources */,
 				798EF5A82B16826F00435ED3 /* JWTHeader.swift in Sources */,
 				79F2DAA92B3507FE0077FC02 /* SalesServiceErrorView.swift in Sources */,
 				79F0D2CE2B33485A00294E55 /* KeychainService.swift in Sources */,
+				7962DE862B75528300AD21F8 /* AuthState.swift in Sources */,
 				79F2DABA2B372B5C0077FC02 /* SettingsInfoView.swift in Sources */,
 				7982A6C82B25EBA4009747BC /* ActiveSubscribersTestData.swift in Sources */,
 				79F2DAB72B3724780077FC02 /* IssuerIDInfoView.swift in Sources */,

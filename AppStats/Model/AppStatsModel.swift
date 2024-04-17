@@ -8,6 +8,7 @@ import Foundation
 import OpenAPIRuntime
 import OpenAPIURLSession
 import SwiftUI
+import Combine
 
 enum AppStatsState {
     case success(subscriberModelData: SubscriptionModelData)
@@ -19,8 +20,12 @@ enum AppStatsState {
 
 class AppStatsModel: ObservableObject {
     @Published var state: AppStatsState = .notInitialized
+    @Published var isLoading: Bool = false
     @Published var salesReportService: SalesReportService?
     @Published var authService: AuthService?
+    
+    @Published var authState: AuthState = AuthState()
+    @Published var salesReportState: SalesReportState = SalesReportState()
     
     func getSubscriptionData() async throws {
         print("Getting subscription data")
@@ -33,6 +38,7 @@ class AppStatsModel: ObservableObject {
         }
         
         do {
+            
             let data = try await salesReportService.getSubscriptionsFromLastSevenDays()
             DispatchQueue.main.async {
                 self.state = .success(subscriberModelData: SubscriptionModelData(data: data))
@@ -120,6 +126,7 @@ class AppStatsModel: ObservableObject {
     }
     
     func initiateAppStatsModel() async throws {
+        self.authState.createAuthService()
         self.authService = self.createAuthService()
         self.salesReportService = self.createSalesReportService()
         do {

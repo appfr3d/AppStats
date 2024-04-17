@@ -29,6 +29,7 @@ struct SettingsView: View {
         let _ = keychainService.saveSecretValue(vendorNumber, forKey: kKeychainVendorNumber)
         let _ = keychainService.saveSecretValue(keyId, forKey: kKeychainKeyId)
         let _ = keychainService.saveSecretValue(issuerId, forKey: kKeychainIssuerId)
+        
         do {
             try await appStatsModel.initiateAppStatsModel()
         } catch let error {
@@ -54,10 +55,9 @@ struct SettingsView: View {
                     SettingsTextField(text: $issuerId, placeholder: "Issuer ID") {
                         IssuerIDInfoView()
                     }
-                    Button("Save") {
-                        Task(priority: .medium) {
-                            try await saveCredentialsToKeychain()
-                        }
+                    
+                    Button("Save") { 
+                        updateKeychain()
                     }
                     .frame(maxWidth: .infinity)
                     .buttonStyle(.borderedProminent)
@@ -68,6 +68,16 @@ struct SettingsView: View {
             .padding([.top, .horizontal])
             .background(Color(.systemGroupedBackground))
             
+        }
+    }
+    
+    func updateKeychain() {
+        Task {
+            do {
+                try await saveCredentialsToKeychain()
+            }catch {
+                print(error)
+            }
         }
     }
 }

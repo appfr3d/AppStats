@@ -20,7 +20,20 @@ class SalesReportService {
         dateFormatter.dateFormat = "yyyy-MM-dd"
     }
     
+    func decodeSubscriptionTSVDataString(str: String, date: Date) throws -> [SubscriptionReport] {
+        let tsv: CSV = try CSV<Named>(string: str, delimiter: .tab)
+        let activeSubscribersRows = try tsv.rows.map { (element: Named.Row) -> SubscriptionReport in
+            return try SubscriptionReport(reportRow: element, date: date)
+        }
+        return activeSubscribersRows
+    }
+    
     func getSubscriptions(date: Date) async throws -> [SubscriptionReport] {
+        let userDefaultsKey = getUserDefaultsSubscriptionKey(forDate: date, andFrequency: .DAILY)
+        if let storedValue = userDefaultsService.string(forKey: userDefaultsKey) {
+            return try decodeSubscriptionTSVDataString(str: storedValue, date: date)
+        }
+        
         let reportDate = [dateFormatter.string(from: date)]
         
         print("Fetching for date: \(reportDate)")
@@ -50,76 +63,15 @@ class SalesReportService {
                 if data.isGzipped {
                     let unzipped = try! data.gunzipped()
                     let str = String(decoding: unzipped, as: Unicode.ASCII.self)
-                    // print(str)
-                    let tsv: CSV = try CSV<Named>(string: str, delimiter: .tab)
-                    // print(tsv.header)
-                    // print(tsv.rows.filter { $0["SKU"] == "blur_premium_monthly" || $0["SKU"] == "blur_premium_three_months" })
-                    // print(tsv.columns?["Subscribers"] ?? "No column named that")
-                    
-                    // print(str)
-                    
                     // Store the TSV data as a string in UserDefaults, now that we know it can be decoded as a tsv
-                    let userDefaultsKey = getUserDefaultsSubscriptionKey(forDate: date, andFrequency: .DAILY)
                     userDefaultsService.set(str, forKey: userDefaultsKey)
-                    
-                    let activeSubscribersRows = try tsv.rows.map { (element: Named.Row) -> SubscriptionReport in
-                        
-                        return try SubscriptionReport(reportRow: element, date: date)
-                        /*
-                        let subscribersFieldName = SalesReportSubscriptionFields.subscribers.rawValue
-                        guard let subscribers = element[subscribersFieldName] else {
-                            print("Cound not get \(subscribersFieldName)")
-                            throw SalesServiceError.tsvFieldNotFound(fieldName: subscribersFieldName)
-                        }
-                        
-                        let countryFieldName = SalesReportSubscriptionFields.country.rawValue
-                        guard let country = element[countryFieldName] else {
-                            print("Cound not get \(countryFieldName)")
-                            throw SalesServiceError.tsvFieldNotFound(fieldName: countryFieldName)
-                        }
-                        
-                        let subscriptionNameFieldName = SalesReportSubscriptionFields.subscriptionName.rawValue
-                        guard let subscriptionName = element[subscriptionNameFieldName] else {
-                            print("Cound not get \(subscriptionNameFieldName)")
-                            throw SalesServiceError.tsvFieldNotFound(fieldName: subscriptionNameFieldName)
-                        }
-                        
-                        var subs = 0.0
-                        if !subscribers.isEmpty {
-                            subs = try Double(value: subscribers)
-                        }
-                        
-                        return ActiveSubscribers(
-                            subscribers: Int(subs),
-                            date: date,
-                            country: country,
-                            subscriptionName: subscriptionName
-                        )*/
-                    }
-                    return activeSubscribersRows
-                    
-//                    if let subs = tsv.columns?["Subscribers"] {
-//                        let sum = subs
-//                            .filter { !$0.isEmpty }
-//                            .compactMap { Double($0) }
-//                            .reduce(0.0, +)
-//                        print("Count nr: \(count) has this many subs: \(sum)")
-//                        return DailySubscribers(
-//                            subscribers: Int(sum),
-//                            date: date,
-//                            country: "NOK",
-//                            subscriptionName: "premium"
-//                        )
-//                    } else {
-//                        throw SalesServiceError.tsvFieldNotFound(fieldName: "Subscribers")
-//                    }
+                    return try decodeSubscriptionTSVDataString(str: str, date: date)
                     
                 } else {
                     print("data is not gzipped...")
                     
                     throw SalesServiceError.dataNotGzipped
                 }
-                // print(buffer)
                 
             }
         case let .badRequest(res):

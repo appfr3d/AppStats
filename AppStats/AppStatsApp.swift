@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct AppStatsApp: App {
     //@State private var subscriptionModelData = SubscriptionModelData(data: ActiveSubscribersTestData.getActiveSubscribers())
-    @StateObject var appStatsModel = AppStatsModel()
+    @StateObject private var appStatsModel = AppStatsModel()
     
     var body: some Scene {
         WindowGroup {

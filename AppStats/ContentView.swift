@@ -17,26 +17,31 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                switch appStatsModel.state {
-                case .success(let subscriberModelData):
-                    HomeView().environmentObject(subscriberModelData)
-                case .authServiceError(let error):
-                    switch error {
+            TabView {
+                VStack {
+                    switch appStatsModel.state {
+                    case .success(let subscriberModelData):
+                        HomeView().environmentObject(subscriberModelData)
+                    case .authServiceError(let error):
+                        switch error {
+                        case .notInitialized:
+                            InsertCredentialsView()
+                        default:
+                            AuthServiceErrorView(error: error)
+                        }
+                    case .salesServiceError(let error):
+                        SalesServiceErrorView(error: error)
                     case .notInitialized:
                         InsertCredentialsView()
-                    default:
-                        AuthServiceErrorView(error: error)
+                    case .loading:
+                        LoadingDataView()
                     }
-                case .salesServiceError(let error):
-                    SalesServiceErrorView(error: error)
-                case .notInitialized:
-                    InsertCredentialsView()
-                case .loading:
-                    LoadingDataView()
+                }
+                .padding()
+                .tabItem {
+                    Label("Subscriptions", systemImage: "list.dash")
                 }
             }
-            .padding()
             .navigationTitle("AppStats 📈")
             .toolbar {
                 NavigationLink(destination: SettingsView()) {
@@ -44,7 +49,7 @@ struct ContentView: View {
                 }
             }
             .onAppear {
-                Task(priority: .medium) {
+                Task {
                     try await appStatsModel.initiateAppStatsModel()
                 }
             }

@@ -35,7 +35,7 @@ class KeychainService {
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
             kSecAttrAccessGroup as String: accessGroup,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
         ]
 
         // Check if the item already exists
