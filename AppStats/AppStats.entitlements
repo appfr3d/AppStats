@@ -10,9 +10,5 @@
 	</array>
 	<key>com.apple.security.files.user-selected.read-only</key>
 	<true/>
-	<key>keychain-access-groups</key>
-	<array>
-		<string>$(AppIdentifierPrefix)group.no.appfred.AppStats.shared</string>
-	</array>
 </dict>
 </plist>

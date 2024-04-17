@@ -35,12 +35,6 @@ class AuthService {
         let claims = AppstoreConnectClaims(iss: issuerID, iat: initiatedAt, exp: expiresAt, aud: "appstoreconnect-v1")
         var ACJWT = JWT(header: header, claims: claims)
         
-//        let privateKeyPath = URL(fileURLWithPath: #file).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("AuthKey.p8")
-//        guard let privateKey: Data = try? Data(contentsOf: privateKeyPath, options: .alwaysMapped) else {
-//            print("Could not get file...")
-//            throw AuthServiceError.apiKeyDataUnreadable
-//        }
-        
         guard let apiKeyData = apiKey.data(using: .utf8) else {
             print("Could not make apit key to Data")
             throw AuthServiceError.apiKeyDataUnreadable

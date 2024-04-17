@@ -11,7 +11,7 @@ class KeychainService {
 
     // MARK: - Properties
 
-    private let accessGroup: String = "RXKX3DV52F.group.no.appfred.AppStats.shared"
+    private let accessGroup: String = "group.no.appfred.AppStats.shared"
     private let service: String
 
     // MARK: - Initialization

@@ -27,6 +27,13 @@ class SalesReportService {
         }
         return activeSubscribersRows
     }
+
+    func decodeSubscriptionTSVData(tsv: CSV, date: Date) throws -> [SubscriptionReport] {
+        let activeSubscribersRows = try tsv.rows.map { (element: Named.Row) -> SubscriptionReport in
+            return try SubscriptionReport(reportRow: element, date: date)
+        }
+        return activeSubscribersRows
+    }
     
     func getSubscriptions(date: Date) async throws -> [SubscriptionReport] {
         let userDefaultsKey = getUserDefaultsSubscriptionKey(forDate: date, andFrequency: .DAILY)
@@ -63,13 +70,14 @@ class SalesReportService {
                 if data.isGzipped {
                     let unzipped = try! data.gunzipped()
                     let str = String(decoding: unzipped, as: Unicode.ASCII.self)
+                    let tsv: CSV = try CSV<Named>(string: str, delimiter: .tab)
+                    
                     // Store the TSV data as a string in UserDefaults, now that we know it can be decoded as a tsv
                     userDefaultsService.set(str, forKey: userDefaultsKey)
-                    return try decodeSubscriptionTSVDataString(str: str, date: date)
+                    return try decodeSubscriptionTSVData(tsv: tsv, date: date)
                     
                 } else {
                     print("data is not gzipped...")
-                    
                     throw SalesServiceError.dataNotGzipped
                 }
                 
@@ -121,6 +129,28 @@ class SalesReportService {
         }
         
         let constantDates = dates
+        
+        do {
+            let subs = try await withThrowingTaskGroup(of: [SubscriptionReport].self) { group -> [SubscriptionReport] in
+                for i in 1...7 {
+                    guard let newDate = Calendar.current.date(byAdding: .day, value: -(9-i), to: theDate) else {
+                        print("Could not get date for i: \(i)")
+                        throw SalesServiceError.dateFormat
+                    }
+                    group.addTask {
+                        let subs = try await self.getSubscriptions(date: newDate)
+                        return subs
+                    }
+                }
+                let allSubs = try await group.reduce(into: [SubscriptionReport]()) { $0 += $1 }
+                return allSubs.sorted { $0.date > $1.date }
+            }
+            return subs
+        } catch let err {
+            print("rip... because: \(err)")
+            throw err
+        }
+        
         
         async let subs1 = getSubscriptions(date: constantDates[0])
         async let subs2 = getSubscriptions(date: constantDates[1])

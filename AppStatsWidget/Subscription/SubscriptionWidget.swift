@@ -11,10 +11,9 @@ struct SubscriptionProvider: AppIntentTimelineProvider {
     }
     
     func timeline(for configuration: SubscriptionAppIntent, in context: Context) async -> Timeline<SubscriptionEntry> {
-        // TODO: Fetch reports
         let model = AppStatsModel()
         do {
-            try await model.initiateAppStatsModel()
+            try await model.initiateWidgetAppStatsModel()
         } catch let error {
             print("Error in timeline: \(error)")
         }
