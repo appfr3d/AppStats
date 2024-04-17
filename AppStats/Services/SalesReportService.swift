@@ -28,7 +28,7 @@ class SalesReportService {
         return activeSubscribersRows
     }
 
-    func decodeSubscriptionTSVData(tsv: CSV, date: Date) throws -> [SubscriptionReport] {
+    func decodeSubscriptionTSVData(tsv: CSV<Named>, date: Date) throws -> [SubscriptionReport] {
         let activeSubscribersRows = try tsv.rows.map { (element: Named.Row) -> SubscriptionReport in
             return try SubscriptionReport(reportRow: element, date: date)
         }

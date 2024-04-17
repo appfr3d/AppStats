@@ -17,33 +17,31 @@ enum AuthStateErrorEnum: Error {
 }
 
 enum AuthStateEnum {
-    case error(error: AuthStateErrorEnum)
-    case success
+    case error(AuthStateErrorEnum)
+    case success(AuthService)
     case notInitialized
 }
 
 final class AuthState: ObservableObject {
     @Published private(set) var state: AuthStateEnum = .notInitialized
-    @Published var authService: AuthService?
     
-    init() {
+    public func initialize() {
         do {
-            self.authService = try createAuthService()
-            self.state = .success
+            let service = try createAuthService()
+            self.state = .success(service)
         } catch {
-            self.state = .error(error: error as! AuthStateErrorEnum)
+            self.state = .error(error as! AuthStateErrorEnum)
         }
     }
     
-    func createAuthService() -> {
+    private func createAuthService() throws -> AuthService {
         let apiKey = getFileImportState(fromValue: keychainService.loadSecretValue(forKey: kKeychainAPIKey))
         let vendorNumber = keychainService.loadSecretValue(forKey: kKeychainVendorNumber)
         let keyId = keychainService.loadSecretValue(forKey: kKeychainKeyId)
         let issuerId = keychainService.loadSecretValue(forKey: kKeychainIssuerId)
         
         guard let vn = vendorNumber, !vn.isEmpty else {
-            self.state = .error(error:AuthStateErrorEnum.vendorNumberEmpty)
-            return
+            throw AuthStateErrorEnum.vendorNumberEmpty
         }
         guard let ki = keyId, !ki.isEmpty else {
             throw AuthStateErrorEnum.keyIdEmpty

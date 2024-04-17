@@ -27,36 +27,40 @@ enum SalesReportStateError: Error {
 }
 
 enum SalesReportStateEnum {
-    case error(error: SalesReportStateError)
-    case success
+    case error(SalesReportStateError)
+    case success(SalesReportService)
     case notInitialized
 }
 
 final class SalesReportState: ObservableObject {
     @Published private(set) var state: SalesReportStateEnum = .notInitialized
-    @Published var salesReportService: SalesReportService?
     
-    func createSalesReportService(authService: AuthService) {
+    func initialize(authService: AuthService) {
         do {
-            let signedToken = try authService.getSignedToken()
-            
-            let sessionConfiguration = URLSessionConfiguration.default
-            sessionConfiguration.httpAdditionalHeaders = [
-                "Authorization": "Bearer \(signedToken)"
-            ]
-            let session = URLSession(configuration: sessionConfiguration)
-            let transportConfiguration = URLSessionTransport.Configuration(session: session)
-            let client = Client(
-                serverURL: try! Servers.server1(),
-                transport: URLSessionTransport(configuration: transportConfiguration)
-            )
-            self.salesReportService = SalesReportService(client: client, vendorNumber: authService.vendorNumber)
+            let service = try self.createSalesReportService(authService: authService)
+            self.state = .success(service)
         } catch {
             if let myError = error as? SalesReportStateError {
-                self.state = .error(error: myError)
+                self.state = .error(myError)
             } else {
-                self.state = .error(error: .unknown)
+                self.state = .error(.unknown)
             }
         }
+    }
+    
+    func createSalesReportService(authService: AuthService) throws -> SalesReportService {
+        let signedToken = try authService.getSignedToken()
+        
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.httpAdditionalHeaders = [
+            "Authorization": "Bearer \(signedToken)"
+        ]
+        let session = URLSession(configuration: sessionConfiguration)
+        let transportConfiguration = URLSessionTransport.Configuration(session: session)
+        let client = Client(
+            serverURL: try! Servers.server1(),
+            transport: URLSessionTransport(configuration: transportConfiguration)
+        )
+        return SalesReportService(client: client, vendorNumber: authService.vendorNumber)
     }
 }

@@ -22,7 +22,6 @@ class AppStatsModel: ObservableObject {
     @Published var state: AppStatsState = .notInitialized
     @Published var isLoading: Bool = false
     @Published var salesReportService: SalesReportService?
-    @Published var authService: AuthService?
     
     @Published var authState: AuthState = AuthState()
     @Published var salesReportState: SalesReportState = SalesReportState()
@@ -58,77 +57,12 @@ class AppStatsModel: ObservableObject {
         }
     }
     
-    func createAuthService() -> AuthService? {
-        let apiKey = getFileImportState(fromValue: keychainService.loadSecretValue(forKey: kKeychainAPIKey))
-        let vendorNumber = keychainService.loadSecretValue(forKey: kKeychainVendorNumber)
-        let keyId = keychainService.loadSecretValue(forKey: kKeychainKeyId)
-        let issuerId = keychainService.loadSecretValue(forKey: kKeychainIssuerId)
-        
-        print("APIKey       : \(apiKey)")
-        print("Vendor number: \(String(describing: vendorNumber))")
-        print("KeyID        : \(String(describing: keyId))")
-        print("IssuerID     : \(String(describing: issuerId))")
-        
-        if let ki = keyId, let vn = vendorNumber, let ii = issuerId, case let .success(ak) = apiKey {
-            print("APIKey       : \(ak)")
-            print("Vendor number: \(vn)")
-            print("KeyID        : \(ki)")
-            print("IssuerID     : \(ii)")
-            return AuthService(keyID: ki, vendorNumber: vn, issuerID: ii, apiKey: ak)
-        }
-        return nil
-    }
-    
-    func createSalesReportService() -> SalesReportService? {
-        guard let authService = authService else {
-            print("Auth service is nil")
-            DispatchQueue.main.async {
-                self.state = .authServiceError(error: .notInitialized)
-            }
-            return nil
-        }
-        
-        DispatchQueue.main.async {
-            self.state = .loading
-        }
-        
-        do {
-            let signedToken = try authService.getSignedToken()
-            
-            let sessionConfiguration = URLSessionConfiguration.default
-            sessionConfiguration.httpAdditionalHeaders = [
-                "Authorization": "Bearer \(signedToken)"
-            ]
-            let session = URLSession(configuration: sessionConfiguration)
-            let transportConfiguration = URLSessionTransport.Configuration(session: session)
-            let client = Client(
-                serverURL: try! Servers.server1(),
-                transport: URLSessionTransport(configuration: transportConfiguration)
-            )
-            
-            
-            print("createSalesReportService success")
-            
-            return SalesReportService(client: client, vendorNumber: authService.vendorNumber)
-        } catch let error {
-            if let myError = error as? AuthServiceError {
-                DispatchQueue.main.async {
-                    self.state = .authServiceError(error: myError)
-                }
-            } else {
-                print("Generic error")
-                DispatchQueue.main.async {
-                    self.state = .authServiceError(error: .unexpected)
-                }
-            }
-            return nil
-        }
-    }
-    
     func initiateAppStatsModel() async throws {
         DispatchQueue.main.async {
-            self.authService = self.createAuthService()
-            self.salesReportService = self.createSalesReportService()
+            self.authState.initialize()
+            if case let .success(authService) = self.authState.state {
+                self.salesReportState.initialize(authService: authService)
+            }
         }
         do {
             try await self.getSubscriptionData()
@@ -138,8 +72,10 @@ class AppStatsModel: ObservableObject {
     }
     
     func initiateWidgetAppStatsModel() async throws {
-        self.authService = self.createAuthService()
-        self.salesReportService = self.createSalesReportService()
+        self.authState.initialize()
+        if case let .success(authService) = self.authState.state {
+            self.salesReportState.initialize(authService: authService)
+        }
         
         do {
             try await self.getSubscriptionData()
